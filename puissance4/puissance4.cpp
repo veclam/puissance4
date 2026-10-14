@@ -1,9 +1,6 @@
 #include <iostream>
 #include <vector>
 
-//Tableau de 6*7 dans lequel on va pouvoir mettre des jetons
-//Les 3 états possibles d'une case : vide, jeton j1, jeton j2
-//meilleur type de donnée pour notre tableau : 
 
 enum  tileState
 {
@@ -143,23 +140,17 @@ tileState switchplayer(tileState currentPlayer)
         return player1;
     }
 }
+
 void checkWinLooseConditions(winState &areYaWinningSon, tileState grid[6][7], tileState currentPlayer, int line, int col)
 {
     int nbChainedCoins = 1;
     for (int i=1; i<4; i++)
     {
-        std::cout<<grid[line+i][col];
-        if (grid[line-i][col] == currentPlayer && i+line < 6)
+        if (grid[col][line-i] == currentPlayer)
         {
             nbChainedCoins++;
         }
-        else
-        {
-            break;
-        }
+        break;
     }
-    if (nbChainedCoins >= 4)
-    {
-        std::cout<<"win";
-    }
+    std::cout<<" "<<nbChainedCoins<<std::endl;
 }
