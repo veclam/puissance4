@@ -13,7 +13,7 @@ enum  winState
     None,
     Draw,
     Player1win,
-    platyer2win
+    Player2win
 };
 
 int selectCol(tileState grid[6][7]);
@@ -21,10 +21,15 @@ void ShowGrid(tileState grid[6][7]);
 void placeJeton(tileState (&grid)[6][7], int col, tileState currentPlayer,int &lastX, int &lastY);
 bool checkGridFreeSpace(tileState grid[6][7], winState &who);
 tileState switchplayer(tileState currentPlayer);
-void checkWinLooseConditions(winState &areYaWinningSon, tileState grid[6][7], tileState currentPlayer, int line, int col);
+winState checkWinLooseConditions(tileState grid[6][7], tileState currentPlayer, int line, int col);
+int horizontal(tileState grid[6][7], int line, int col, tileState currentPlayer);
+int vertical(tileState grid[6][7], int line, int col, tileState currentPlayer);
+int diagonal1(tileState grid[6][7], int line, int col, tileState currentPlayer);
+int diagonal2(tileState grid[6][7], int line, int col, tileState currentPlayer);
+winState checkNbChainedCoins(int nbChainedCoins, tileState currentPlayer);
 
 
-int main(int argc, char* argv[])
+int main()
 {
     winState whoWinner = None;
     tileState player = player1;
@@ -40,17 +45,31 @@ int main(int argc, char* argv[])
     }
     while (whoWinner == None)
     {
-        // player = switchplayer(player);
+        player = switchplayer(player);
         ShowGrid(grid);
+        placeJeton(grid, selectCol(grid), player,lastX,lastY);
+        whoWinner = checkWinLooseConditions(grid,player,lastX,lastY);
+        system("cls");
         if (!checkGridFreeSpace(grid,whoWinner))
         {
             std::cout<<"fin";
-            break;
+            whoWinner = Draw;
         }
-        placeJeton(grid, selectCol(grid), player,lastX,lastY);
-        checkWinLooseConditions(whoWinner,grid,player,lastX,lastY);
-        // system("cls");
         
+    }
+    system("cls");
+    ShowGrid(grid);
+    switch (whoWinner)
+    {
+    case Draw:
+        std::cout<<"draw";
+        break;
+    case Player1win:
+        std::cout<<"player1win";
+        break;
+    case Player2win:  
+        std::cout<<"player2win";
+        break;
     }
     return 1;
 }
@@ -140,17 +159,155 @@ tileState switchplayer(tileState currentPlayer)
         return player1;
     }
 }
-
-void checkWinLooseConditions(winState &areYaWinningSon, tileState grid[6][7], tileState currentPlayer, int line, int col)
+winState checkWinLooseConditions(tileState grid[6][7], tileState currentPlayer, int line, int col)
+{
+    int nbChainedCoins = 0;
+    winState whoWinner = None;
+    nbChainedCoins = horizontal(grid, line, col, currentPlayer);
+    whoWinner = checkNbChainedCoins(nbChainedCoins, currentPlayer);
+    if (whoWinner != None)
+    {
+        return whoWinner;
+    }
+    nbChainedCoins = vertical(grid, line, col, currentPlayer);
+    whoWinner = checkNbChainedCoins(nbChainedCoins, currentPlayer);
+    if (whoWinner != None)
+    {
+        return whoWinner;
+    }
+    nbChainedCoins = diagonal1(grid, line, col, currentPlayer);
+    whoWinner = checkNbChainedCoins(nbChainedCoins, currentPlayer);
+    if (whoWinner != None)
+    {
+        return whoWinner;
+    }
+    nbChainedCoins = diagonal2(grid, line, col, currentPlayer);
+    whoWinner = checkNbChainedCoins(nbChainedCoins, currentPlayer);
+    if (whoWinner != None)
+    {
+        return whoWinner;
+    }
+    return None;
+}
+int horizontal(tileState grid[6][7], int line, int col, tileState currentPlayer)
 {
     int nbChainedCoins = 1;
-    for (int i=1; i<4; i++)
+    for (int i = 1; i < 4; i++)
     {
-        if (grid[col][line-i] == currentPlayer)
+        if (grid[line][col-i] == currentPlayer)
         {
             nbChainedCoins++;
         }
-        break;
+        else
+        {
+            break;
+        }
     }
-    std::cout<<" "<<nbChainedCoins<<std::endl;
+    for (int i = 1; i < 4; i++)
+    {
+        if (grid[line][col+i] == currentPlayer)
+        {
+            nbChainedCoins++;
+        }
+        else
+        {
+            break;
+        }
+    }
+    return nbChainedCoins;
+}
+int vertical(tileState grid[6][7], int line, int col, tileState currentPlayer)
+{
+    int nbChainedCoins = 1;
+    for (int i = 1; i < 4; i++)
+    {
+        if (grid[line+i][col] == currentPlayer)
+        {
+            nbChainedCoins++;
+        }
+        else
+        {
+            break;
+        }
+    }
+    for (int i = 1; i < 4; i++)
+    {
+        if (grid[line-i][col] == currentPlayer)
+        {
+            nbChainedCoins++;
+        }
+        else
+        {
+            break;
+        }
+    }
+    return nbChainedCoins;
+}
+int diagonal1(tileState grid[6][7], int line, int col, tileState currentPlayer)
+{
+    int nbChainedCoins = 1;
+    for (int i = 1; i < 4; i++)
+    {
+        if (grid[line+i][col+i] == currentPlayer)
+        {
+            nbChainedCoins++;
+        }
+        else
+        {
+            break;
+        }
+    }
+    for (int i = 1; i < 4; i++)
+    {
+        if (grid[line-i][col-i] == currentPlayer)
+        {
+            nbChainedCoins++;
+        }
+        else
+        {
+            break;
+        }
+    }
+    return nbChainedCoins;
+}
+int diagonal2(tileState grid[6][7], int line, int col, tileState currentPlayer)
+{
+    int nbChainedCoins = 1;
+    for (int i = 1; i < 4; i++)
+    {
+        if (grid[line-i][col+i] == currentPlayer)
+        {
+            nbChainedCoins++;
+        }
+        else
+        {
+            break;
+        }
+    }
+    for (int i = 1; i < 4; i++)
+    {
+        if (grid[line+i][col-i] == currentPlayer)
+        {
+            nbChainedCoins++;
+        }
+        else
+        {
+            break;
+        }
+    }
+    return nbChainedCoins;
+}
+winState checkNbChainedCoins(int nbChainedCoins, tileState currentPlayer)
+{
+    if (nbChainedCoins >=4)
+    {
+        switch (currentPlayer)
+        {
+        case player1: 
+            return Player1win;
+        case player2:
+            return Player2win;
+        }
+    }
+    return None;
 }
