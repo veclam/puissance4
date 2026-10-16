@@ -29,7 +29,7 @@ int diagonal2(tileState grid[6][7], int line, int col, tileState currentPlayer);
 winState checkNbChainedCoins(int nbChainedCoins, tileState currentPlayer);
 
 
-int main()
+void main()
 {
     winState whoWinner = None;
     tileState player = player1;
@@ -71,7 +71,6 @@ int main()
         std::cout<<"player2win";
         break;
     }
-    return 1;
 }
 
 
